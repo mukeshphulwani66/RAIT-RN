@@ -1,8 +1,8 @@
 import { View, Text ,Image,FlatList,StyleSheet,ScrollView} from 'react-native'
 import React from 'react'
-import {Card} from 'react-native-paper'
+import {Card, Button} from 'react-native-paper'
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
 
 
     const users = [
@@ -46,6 +46,7 @@ const HomeScreen = () => {
         renderItem={({item})=><RenderCard item={item} />}
         keyExtractor={(item)=>item.id}  
        />
+
        
     </View>
   )

@@ -1,40 +1,51 @@
-import { View, Text ,Image,FlatList,StyleSheet,ScrollView} from 'react-native'
-import React from 'react'
+import { View, Text ,Image,FlatList,StyleSheet,ScrollView,Linking} from 'react-native'
+import React,{useState,useEffect} from 'react'
 import {Card, Button} from 'react-native-paper'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused} from '@react-navigation/native'
+import { Ionicons } from '@expo/vector-icons'; 
 
 const HomeScreen = ({navigation}) => {
+   const focus = useIsFocused()
 
+    const [users,setUsers] = useState([])
 
-    const users = [
-        {
-          id:1,
-          name:"Ramesh verma",
-          img:"https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-        },
-        {
-          id:2,
-          name:"Suresh kumar",
-          img:"https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-        },
-        {
-          id:3,
-          name:"Hitesh verma",
-          img:"https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+    const openDial = (phone) =>{
+       Linking.openURL(`tel:${phone}`)
+    }
+    const getAllContacts = async () => {
+      try {
+        const value = await AsyncStorage.getItem('contacts')
+        if(value !== null) {
+          setUsers(JSON.parse(value))
         }
-       
-    ]
-    
+      } catch(e) {
+        console.log(e)
+       alert("Error getting contacts")
+      }
+    }
+
+    useEffect(async ()=>{
+      getAllContacts()
+    },[])
+
+    useEffect(()=>{
+      getAllContacts()
+    },[focus])
     
   const RenderCard =  ({item})=>{
             return(
                 <Card style={styles.card}>
-                    <View key={item.id} style={styles.cardView}>
+                  <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center"}}>
+                     <View key={item.phone} style={styles.cardView}>
                         <Image
                         style={styles.icon}
-                        source={{uri:item.img}}
+                        source={{uri:item.image}}
                         />
-                        <Text style={styles.textStyle}>{item.name}</Text>
-                   </View>    
+                        <Text style={styles.textStyle}>{item.firstName} {item.lastName}</Text>
+                    </View>  
+                    <Ionicons name="call" size={30} color="green" onPress={()=>openDial(item.phone)} />  
+                  </View>
                 </Card> 
             )
   }
@@ -56,6 +67,7 @@ const HomeScreen = ({navigation}) => {
 const styles = StyleSheet.create({
     card:{
         margin: 5,
+        padding: 5
     },
     cardView:{
       margin: 10,
